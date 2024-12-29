@@ -1,0 +1,88 @@
+<header class="mb-6">
+    <h1 class="text-4xl font-bold text-gray-800">Woordjes</h1>
+</header>
+
+<main class="mb-6 flex-1 flex flex-col">
+    <div class="grid grid-rows-6 gap-1 mx-auto">
+        @for (word of words; track idxWord; let idxWord = $index) {
+            <div class="grid gap-1" ngClass="grid-cols-{{ wordLength() }}">
+                @for (l of word; track idx; let idx = $index) {
+                    <div
+                        (click)="letter(idxWord, idx)"
+                        class="w-16 h-16 border-2 rounded border-gray-400 flex items-center justify-center text-3xl font-bold text-gray-800"
+                        [ngClass]="{
+                            'bg-amber-400': l?.type === letterType.somewhere,
+                            'bg-gray-400': l?.type === letterType.nowhere,
+                            'bg-green-500': l?.type === letterType.correct,
+                            'border-gray-300': l !== null,
+                            'border-red-400': y() === idxWord && x() === idx,
+                        }"
+                    >
+                        {{ l?.letter }}
+                    </div>
+                }
+            </div>
+        }
+    </div>
+    @if (error(); as error) {
+        <div class="text-xs text-red-700 mt-2">{{ error }}</div>
+    }
+    @if (possible(); as possible) {
+        <div class="text-center font-bold mt-4">
+            Antwoorden <span class="text-sm font-normal text-gray-500">({{ possible.length }})</span>
+        </div>
+        <div class="grid grid-cols-4 gap-1 mt-2 justify-center text-center">
+            @for (p of possible; track p) {
+                <div class="text-xs">{{ p }}</div>
+            }
+        </div>
+    }
+</main>
+
+<!-- Keyboard -->
+<footer class="w-full max-w-md sticky bottom-0 bg-gray-100">
+    <div class="grid grid-cols-10 justify-center gap-1 mb-4 mt-2">
+        <!-- Row 1 -->
+        <button (click)="key(az.q)" class="h-12 bg-gray-300 rounded text-lg font-bold">Q</button>
+        <button (click)="key(az.w)" class="h-12 bg-gray-300 rounded text-lg font-bold">W</button>
+        <button (click)="key(az.e)" class="h-12 bg-gray-300 rounded text-lg font-bold">E</button>
+        <button (click)="key(az.r)" class="h-12 bg-gray-300 rounded text-lg font-bold">R</button>
+        <button (click)="key(az.t)" class="h-12 bg-gray-300 rounded text-lg font-bold">T</button>
+        <button (click)="key(az.y)" class="h-12 bg-gray-300 rounded text-lg font-bold">Y</button>
+        <button (click)="key(az.u)" class="h-12 bg-gray-300 rounded text-lg font-bold">U</button>
+        <button (click)="key(az.i)" class="h-12 bg-gray-300 rounded text-lg font-bold">I</button>
+        <button (click)="key(az.o)" class="h-12 bg-gray-300 rounded text-lg font-bold">O</button>
+        <button (click)="key(az.p)" class="h-12 bg-gray-300 rounded text-lg font-bold">P</button>
+
+        <!-- Row 2 -->
+        <button (click)="key(az.a)" class="h-12 bg-gray-300 rounded text-lg font-bold">A</button>
+        <button (click)="key(az.s)" class="h-12 bg-gray-300 rounded text-lg font-bold">S</button>
+        <button (click)="key(az.d)" class="h-12 bg-gray-300 rounded text-lg font-bold">D</button>
+        <button (click)="key(az.f)" class="h-12 bg-gray-300 rounded text-lg font-bold">F</button>
+        <button (click)="key(az.g)" class="h-12 bg-gray-300 rounded text-lg font-bold">G</button>
+        <button (click)="key(az.h)" class="h-12 bg-gray-300 rounded text-lg font-bold">H</button>
+        <button (click)="key(az.j)" class="h-12 bg-gray-300 rounded text-lg font-bold">J</button>
+        <button (click)="key(az.k)" class="h-12 bg-gray-300 rounded text-lg font-bold">K</button>
+        <button (click)="key(az.l)" class="h-12 bg-gray-300 rounded text-lg font-bold">L</button>
+
+        <button (click)="del()" class="h-12 bg-gray-300 rounded text-lg font-bold">
+            <img class="w-5 mx-auto" src="./assets/delete.png" />
+        </button>
+
+        <!-- Row 3 -->
+        <div></div>
+        <button (click)="key(az.z)" class="h-12 bg-gray-300 rounded text-lg font-bold">Z</button>
+        <button (click)="key(az.x)" class="h-12 bg-gray-300 rounded text-lg font-bold">X</button>
+        <button (click)="key(az.c)" class="h-12 bg-gray-300 rounded text-lg font-bold">C</button>
+        <button (click)="key(az.v)" class="h-12 bg-gray-300 rounded text-lg font-bold">V</button>
+        <button (click)="key(az.b)" class="h-12 bg-gray-300 rounded text-lg font-bold">B</button>
+        <button (click)="key(az.n)" class="h-12 bg-gray-300 rounded text-lg font-bold">N</button>
+        <button (click)="key(az.m)" class="h-12 bg-gray-300 rounded text-lg font-bold">M</button>
+        <div></div>
+        <div></div>
+
+        <!-- <button (click)="enter()" class="grid-cols-subgrid col-span-2 h-12 bg-gray-300 rounded text-lg font-bold">
+            ENTER
+        </button> -->
+    </div>
+</footer>
