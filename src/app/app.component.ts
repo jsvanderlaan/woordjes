@@ -1,6 +1,6 @@
 import { NgClass } from '@angular/common';
 import { Component, computed, signal } from '@angular/core';
-import { ANSWERS_5 } from './answers';
+import { ANSWERS } from './answers';
 
 @Component({
     selector: 'app-root',
@@ -10,6 +10,7 @@ import { ANSWERS_5 } from './answers';
     styles: [],
 })
 export class AppComponent {
+    readonly defaultWordLength = 5;
     readonly error = signal<string | null>(null);
     readonly possible = signal<string[] | null>(null);
     readonly focus = signal<number>(0);
@@ -18,15 +19,21 @@ export class AppComponent {
     readonly letterType = LetterType;
     readonly az = AZ;
 
+    readonly numberRange: number[] = Object.keys(ANSWERS).map(x => +x);
+
     readonly attempts = 6;
-    readonly wordLength = signal<number>(5);
-    readonly words: (Letter | null)[][] = Array(this.attempts)
+    readonly wordLength = signal<number>(this.defaultWordLength);
+    words: (Letter | null)[][] = Array(this.attempts)
         .fill(null)
         .map(() => Array(this.wordLength()).fill(null));
 
     constructor() {
         this.calc();
         document.addEventListener('keydown', event => this.onKeyPress(event));
+    }
+
+    floor(num: number): number {
+        return Math.floor(num);
     }
 
     key(str: AZ): void {
@@ -42,20 +49,21 @@ export class AppComponent {
 
     onKeyPress(event: KeyboardEvent): void {
         const key = event.key.toUpperCase();
-        event.preventDefault();
 
         if (key === 'BACKSPACE') {
+            event.preventDefault();
             this.del();
         } else if (key === ' ') {
+            event.preventDefault();
             this.setFocus(1);
         } else if (key === 'ENTER') {
+            event.preventDefault();
             this.setFocus(this.wordLength());
         } else if (key.length === 1 && key >= 'A' && key <= 'Z') {
+            event.preventDefault();
             this.key(key as AZ);
         }
     }
-
-    // enter(): void {}
 
     letter(wordIdx: number, letterIdx: number): void {
         this.focus.set(wordIdx * this.wordLength() + letterIdx);
@@ -77,6 +85,16 @@ export class AppComponent {
         this.calc();
     }
 
+    onNumberChange(num: number): void {
+        this.wordLength.set(+num);
+        this.focus.set(0);
+        this.words = Array(this.attempts)
+            .fill(null)
+            .map(() => Array(this.wordLength()).fill(null));
+
+        this.calc();
+    }
+
     private calc(): void {
         this.error.set(null);
         const limits: {
@@ -90,88 +108,85 @@ export class AppComponent {
         };
 
         try {
-            this.words
-                .filter(word => word.filter(letter => letter !== null).length === 5)
-                .forEach((word, wordI) =>
-                    word.forEach((letter, i) => {
-                        if (letter?.type === LetterType.correct) {
-                            if (limits.correct[i] !== null && limits.correct[i] !== letter.letter) {
-                                throw new Error(
-                                    `Woord ${wordI + 1}: '${letter.letter}' kan niet groen zijn als ${i + 1}e letter, want ${
-                                        limits.correct[i]
-                                    } is al groen in die positie.`
-                                );
-                            }
-
-                            if (limits.incorrect[i] !== null && limits.incorrect[i]?.some(x => x === letter.letter)) {
-                                throw new Error(
-                                    `Woord ${wordI + 1}: '${letter.letter}' kan niet groen zijn als ${i + 1}e letter, want hij is al oranje in een ander woord.`
-                                );
-                            }
-
-                            limits.correct[i] = letter.letter;
-                        } else if (letter?.type === LetterType.somewhere) {
-                            if (limits.correct[i] === letter.letter) {
-                                throw new Error(
-                                    `Woord ${wordI + 1}: '${letter.letter}' kan niet orangje zijn als ${i + 1}e letter, want hij is al groen in een ander woord.`
-                                );
-                            }
-                            limits.incorrect[i] = [...new Set([...(limits.incorrect[i] ?? []), letter.letter].filter(x => x))];
-                        } else if (letter?.type === LetterType.nowhere) {
-                            let max = 0;
-                            max +=
-                                word.filter(
-                                    w =>
-                                        w?.letter === letter.letter &&
-                                        (w?.type === LetterType.correct || w?.type === LetterType.somewhere)
-                                ).length ?? 0;
-
-                            const curr = limits.maxAmount[letter.letter];
-                            if (curr !== undefined && curr !== null && curr !== max) {
-                                throw new Error(
-                                    `Woord ${wordI + 1}: '${
-                                        letter.letter
-                                    }' kan niet ${max} keer voor komen, want in een voorgaand woord kon hij maar ${curr} keer voorkomen.`
-                                );
-                            }
-                            limits.maxAmount[letter.letter] = max;
+            this.words.forEach((word, wordI) =>
+                word.forEach((letter, i) => {
+                    if (letter?.type === LetterType.correct) {
+                        if (limits.correct[i] !== null && limits.correct[i] !== letter.letter) {
+                            throw new Error(
+                                `Woord ${wordI + 1}: '${letter.letter}' kan niet groen zijn als ${i + 1}e letter, want ${
+                                    limits.correct[i]
+                                } is al groen in die positie.`
+                            );
                         }
-                    })
-                );
+
+                        if (limits.incorrect[i] !== null && limits.incorrect[i]?.some(x => x === letter.letter)) {
+                            throw new Error(
+                                `Woord ${wordI + 1}: '${letter.letter}' kan niet groen zijn als ${i + 1}e letter, want hij is al oranje in een ander woord.`
+                            );
+                        }
+
+                        limits.correct[i] = letter.letter;
+                    } else if (letter?.type === LetterType.somewhere) {
+                        if (limits.correct[i] === letter.letter) {
+                            throw new Error(
+                                `Woord ${wordI + 1}: '${letter.letter}' kan niet orangje zijn als ${i + 1}e letter, want hij is al groen in een ander woord.`
+                            );
+                        }
+                        limits.incorrect[i] = [...new Set([...(limits.incorrect[i] ?? []), letter.letter].filter(x => x))];
+                    } else if (letter?.type === LetterType.nowhere) {
+                        let max = 0;
+                        max +=
+                            word.filter(
+                                w =>
+                                    w?.letter === letter.letter &&
+                                    (w?.type === LetterType.correct || w?.type === LetterType.somewhere)
+                            ).length ?? 0;
+
+                        const curr = limits.maxAmount[letter.letter];
+                        if (curr !== undefined && curr !== null && curr !== max) {
+                            throw new Error(
+                                `Woord ${wordI + 1}: '${
+                                    letter.letter
+                                }' kan niet ${max} keer voor komen, want in een voorgaand woord kon hij maar ${curr} keer voorkomen.`
+                            );
+                        }
+                        limits.maxAmount[letter.letter] = max;
+                    }
+                })
+            );
         } catch (e: any) {
             this.error.set(e?.message);
             this.possible.set(null);
             return;
         }
 
-        this.possible.set(
-            ANSWERS_5.filter(answer => {
-                // todo answers_6
-                for (let i = 0; i < this.wordLength(); i++) {
-                    if (limits.correct[i] !== null && answer[i] !== limits.correct[i]) {
-                        return false;
-                    }
-                    if (limits.incorrect[i] !== null && limits.incorrect[i]?.some(x => x === answer[i])) {
-                        return false;
-                    }
-                }
-                if (
-                    Object.entries(limits.maxAmount)
-                        .filter(([_, amount]) => amount !== null)
-                        .some(entry => {
-                            const max = entry[1];
-                            if (max === null) {
-                                return false;
-                            }
-                            const occurances = answer.split(entry[0]).length - 1;
-                            return max < occurances;
-                        })
-                ) {
+        const result = ANSWERS[this.wordLength()].filter(answer => {
+            for (let i = 0; i < this.wordLength(); i++) {
+                if (limits.correct[i] !== null && answer[i] !== limits.correct[i]) {
                     return false;
                 }
-                return true;
-            })
-        );
+                if (limits.incorrect[i] !== null && limits.incorrect[i]?.some(x => x === answer[i])) {
+                    return false;
+                }
+            }
+            if (
+                Object.entries(limits.maxAmount)
+                    .filter(([_, amount]) => amount !== null)
+                    .some(entry => {
+                        const max = entry[1];
+                        if (max === null) {
+                            return false;
+                        }
+                        const occurances = answer.split(entry[0]).length - 1;
+                        return max !== occurances;
+                    })
+            ) {
+                return false;
+            }
+            return true;
+        });
+
+        this.possible.set(result);
     }
 
     private setFocus(delta: number): void {
