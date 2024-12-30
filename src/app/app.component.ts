@@ -1,6 +1,5 @@
 import { NgClass } from '@angular/common';
 import { Component, computed, signal } from '@angular/core';
-import { ANSWERS } from './answers';
 import { AZ, Letter, LetterType } from './types';
 import { WorkerService } from './worker.service';
 
@@ -23,7 +22,10 @@ export class AppComponent {
 
     readonly loading = this._workerService.loading;
 
-    readonly numberRange: number[] = Object.keys(ANSWERS).map(x => +x);
+    readonly numberRange: number[] = [
+        2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33,
+        35, 36, 37, 41, 42, 43, 44, 46, 48,
+    ];
 
     readonly attempts = 6;
     readonly wordLength = signal<number>(this.defaultWordLength);
