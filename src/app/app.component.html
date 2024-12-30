@@ -16,7 +16,7 @@
 </header>
 
 <main class="mb-6 flex-1 flex flex-col max-w-[90vw]">
-    <div class="grid grid-rows-6 gap-1 overflow-x-scroll" attr.style="grid-template-columns: repeat({{ wordLength() }}, 1fr)">
+    <div class="grid grid-rows-6 gap-1 overflow-x-auto" attr.style="grid-template-columns: repeat({{ wordLength() }}, 1fr)">
         @for (word of words; track idxWord; let idxWord = $index) {
             @for (l of word; track idx; let idx = $index) {
                 <div
@@ -40,16 +40,23 @@
     }
     @if (possible(); as possible) {
         <div class="text-center font-bold mt-4">
-            Antwoorden <span class="text-sm font-normal text-gray-500">({{ possible.length }})</span>
-        </div>
-        <div
-            class="grid gap-1 mt-2 justify-center text-center"
-            attr.style="grid-template-columns: repeat({{ floor(20 / wordLength()) }}, 1fr)"
-        >
-            @for (p of possible; track p) {
-                <div class="text-xs">{{ p }}</div>
+            Antwoorden
+            @if (!loading()) {
+                <span class="text-sm font-normal text-gray-500">({{ possible.length }})</span>
             }
         </div>
+        @if (loading()) {
+            <div class="text-center">momentje...</div>
+        } @else {
+            <div
+                class="grid gap-1 mt-2 justify-center text-center"
+                attr.style="grid-template-columns: repeat({{ floor(20 / wordLength()) }}, 1fr)"
+            >
+                @for (p of possible; track p) {
+                    <div class="text-xs">{{ p }}</div>
+                }
+            </div>
+        }
     }
 </main>
 
