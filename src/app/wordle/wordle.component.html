@@ -1,0 +1,39 @@
+<div class="mb-6 max-w-[90vw] mx-auto">
+    <div
+        class="grid grid-rows-6 gap-1 overflow-x-auto max-w-min mx-auto"
+        attr.style="grid-template-columns: repeat({{ wordLength() }}, 1fr)"
+    >
+        @for (word of words; track idxWord; let idxWord = $index) {
+            @for (l of word; track idx; let idx = $index) {
+                <div
+                    (click)="letter(idxWord, idx)"
+                    class="w-12 h-12 md:w-16 md:h-16 border-2 rounded border-gray-400 flex items-center justify-center text-3xl font-bold text-gray-800"
+                    [ngClass]="{
+                        'bg-amber-400': l?.type === letterType.somewhere,
+                        'bg-gray-400': l?.type === letterType.nowhere,
+                        'bg-green-500': l?.type === letterType.correct,
+                        'border-gray-300': l !== null,
+                        'border-red-400': y() === idxWord && x() === idx,
+                    }"
+                >
+                    {{ l?.letter }}
+                </div>
+            }
+        }
+    </div>
+</div>
+<div class="flex flex-row gap-2 justify-center">
+    <label for="woordlengte" class="align-text-bottom">Woordlengte:</label>
+    <select
+        id="woordlengte"
+        #woordlengte
+        class="px-1 text-sm border border-gray-300 rounded bg-white text-gray-700 h-7"
+        (change)="onNumberChange($any($event.target).value)"
+    >
+        @for (number of numberRange(); track number) {
+            <option [value]="number" [selected]="number === defaultWordLength">
+                {{ number }}
+            </option>
+        }
+    </select>
+</div>

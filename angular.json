@@ -3,7 +3,7 @@
     "version": 1,
     "newProjectRoot": "projects",
     "projects": {
-        "wordle": {
+        "woordjes": {
             "projectType": "application",
             "schematics": {
                 "@schematics/angular:component": {
@@ -42,7 +42,7 @@
                     "builder": "@angular/build:application",
                     "options": {
                         "outputPath": {
-                            "base": "dist/wordle"
+                            "base": "dist/woordjes"
                         },
                         "index": "src/index.html",
                         "polyfills": ["zone.js"],
@@ -83,10 +83,10 @@
                     "builder": "@angular/build:dev-server",
                     "configurations": {
                         "production": {
-                            "buildTarget": "wordle:build:production"
+                            "buildTarget": "woordjes:build:production"
                         },
                         "development": {
-                            "buildTarget": "wordle:build:development"
+                            "buildTarget": "woordjes:build:development"
                         }
                     },
                     "defaultConfiguration": "development"
@@ -94,7 +94,7 @@
                 "extract-i18n": {
                     "builder": "@angular/build:extract-i18n",
                     "options": {
-                        "buildTarget": "wordle:build"
+                        "buildTarget": "woordjes:build"
                     }
                 }
             }

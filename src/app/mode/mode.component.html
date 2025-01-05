@@ -1,0 +1,14 @@
+<div class="flex gap-1">
+    @for (m of modes; track m) {
+        <button
+            [ngClass]="{
+                grayscale: m !== mode.current(),
+            }"
+            class="w-8 h-8"
+            [value]="m"
+            (click)="onModeChange(m)"
+        >
+            <img attr.src="./assets/{{ m }}.svg" />
+        </button>
+    }
+</div>

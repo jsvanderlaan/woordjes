@@ -1,11 +1,33 @@
 /// <reference lib="webworker" />
 
-import { ANSWERS } from './answers';
-import { AZ, Letter, LetterType, Limits } from './types';
+import { AZ, Language, Letter, LetterType, Limits } from './types';
 
-addEventListener('message', ({ data }) => {
+addEventListener('message', async ({ data }) => {
+    if (data.mode === 'wordle') {
+        await wordle(data);
+    } else if (data.mode === 'search') {
+        await search(data);
+    }
+});
+
+async function search(data: any) {
+    console.log(data);
+    const str: string = data.str;
+    const language: Language = data.lang;
+
+    const answers = Object.values(
+        (await (await fetch(`./assets/woorden/answers_${language}.json`)).json()) as Record<string, string[]>
+    )
+        .flatMap(x => x)
+        .filter(word => word.includes(str));
+
+    postMessage(answers);
+}
+
+async function wordle(data: any) {
     const words: (Letter | null)[][] = data.words;
     const wordLength: number = data.wordLength;
+    const language: Language = data.lang;
 
     const limits: Limits = {
         correct: Array(wordLength).fill(null),
@@ -80,7 +102,9 @@ addEventListener('message', ({ data }) => {
         return;
     }
 
-    const result = ANSWERS[wordLength].filter(answer => {
+    const answers = (await (await fetch(`./assets/woorden/answers_${language}.json`)).json()) as Record<string, string[]>;
+
+    const result = answers[wordLength].filter(answer => {
         for (let i = 0; i < wordLength; i++) {
             if (limits.correct[i] !== null && answer[i] !== limits.correct[i]) {
                 return false;
@@ -117,4 +141,4 @@ addEventListener('message', ({ data }) => {
     });
 
     postMessage(result);
-});
+}
