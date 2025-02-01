@@ -1,6 +1,6 @@
 @if (answers.list(); as list) {
     <div class="text-center font-bold mt-4">
-        Antwoorden
+        Resultaat
         @if (!answers.loading()) {
             <!-- prettier-ignore -->
             <span class="text-sm font-normal text-gray-500">(@if (list.length > previewSize && !showAll()) {{{ previewSize }}/}{{ list.length }})</span>

@@ -4,7 +4,7 @@
     <div class="w-16 h-full"><language /></div>
 </header>
 
-<main class="flex-1">
+<main class="flex-1 pb-4">
     @if (mode.current() === modeType.wordle) {
         <wordle />
     } @else if (mode.current() === modeType.search) {
@@ -13,6 +13,8 @@
     <answers />
 </main>
 
-<footer class="w-full sticky bottom-0 bg-gray-100">
-    <keyboard />
-</footer>
+@if (mode.current() === modeType.wordle) {
+    <footer class="w-full sticky bottom-0 bg-gray-100">
+        <keyboard />
+    </footer>
+}

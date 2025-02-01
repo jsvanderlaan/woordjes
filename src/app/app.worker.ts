@@ -11,15 +11,20 @@ addEventListener('message', async ({ data }) => {
 });
 
 async function search(data: any) {
-    console.log(data);
-    const str: string = data.str;
+    const str: string = data.str
+        .normalize('NFD')
+        .replace(/[^a-zA-Z*?]/g, '')
+        .replace(/[?]/g, '.')
+        .replace(/[*]/g, '.*')
+        .toUpperCase();
+    const contains: boolean = data.contains;
     const language: Language = data.lang;
 
     const answers = Object.values(
         (await (await fetch(`./assets/woorden/answers_${language}.json`)).json()) as Record<string, string[]>
     )
         .flatMap(x => x)
-        .filter(word => word.includes(str));
+        .filter(word => new RegExp(contains ? str : `^${str}$`).test(word));
 
     postMessage(answers);
 }

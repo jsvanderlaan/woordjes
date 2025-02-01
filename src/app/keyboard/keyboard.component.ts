@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnDestroy } from '@angular/core';
 import { KeyboardService } from '../services/keyboard.service';
 import { Key } from '../types';
 
@@ -9,11 +9,16 @@ import { Key } from '../types';
     imports: [],
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class KeyboardComponent {
+export class KeyboardComponent implements OnDestroy {
+    private readonly _onKeyPress = (event: KeyboardEvent) => this.onKeyPress(event);
     readonly key = Key;
 
     constructor(private readonly _keyboard: KeyboardService) {
-        document.addEventListener('keydown', event => this.onKeyPress(event));
+        document.addEventListener('keydown', this._onKeyPress);
+    }
+
+    ngOnDestroy(): void {
+        document.removeEventListener('keydown', this._onKeyPress);
     }
 
     onKeyPress(event: KeyboardEvent): void {

@@ -1,4 +1,58 @@
 <div class="flex flex-col items-center">
-    <!-- todo: beetje uitleg over en toevoegen van wildcards -->
-    <input #search class="border-2 rounded border-green-700 px-2 py-1 text-lg" type="text" autofocus />
+    <div class="flex flex-row gap-2 mb-2">
+        <div class="text-center font-bold">Zoeken</div>
+        <div class="relative">
+            <!-- Hidden checkbox to toggle the popover -->
+            <input type="checkbox" id="info-toggle" class="peer hidden" />
+
+            <!-- Info button -->
+            <label
+                for="info-toggle"
+                class="w-5 h-5 flex items-center justify-center bg-gray-200 text-gray-700 rounded-full text-xs cursor-pointer peer-checked:bg-gray-300 focus-within:bg-gray-300"
+            >
+                ℹ
+            </label>
+
+            <!-- Popover -->
+            <div
+                class="z-10 absolute left-1/2 -translate-x-1/2 top-6 w-72 bg-white text-gray-700 text-xs p-3 shadow-lg rounded-lg border border-gray-300 opacity-0 peer-checked:opacity-100 peer-checked:pointer-events-auto pointer-events-none transition-opacity"
+            >
+                <strong class="text-gray-800">Zoekfunctie:</strong>
+                <ul class="list-disc list-inside mt-1 text-gray-700 pl-2">
+                    <li>Alleen letters worden meegenomen.</li>
+                    <li>Gebruik <code class="bg-gray-200 px-1 rounded">?</code> als wildcard voor één letter.</li>
+                    <li>Gebruik <code class="bg-gray-200 px-1 rounded">*</code> als wildcard voor nul of meer letters.</li>
+                </ul>
+                <strong class="text-gray-800 mt-2 block">Voorbeelden:</strong>
+                <ul class="list-disc list-inside mt-1 text-gray-700 pl-2">
+                    <li>
+                        <code class="bg-gray-200 px-1 rounded">h?nd</code> vindt <em class="text-gray-900">hand</em> en
+                        <em class="text-gray-900">hond</em>.
+                    </li>
+                    <li>
+                        <code class="bg-gray-200 px-1 rounded">ma*</code> vindt <em class="text-gray-900">maan</em>,
+                        <em class="text-gray-900">markt</em>, <em class="text-gray-900">magnetisch</em>, etc.
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <input
+        #search
+        class="border-2 rounded border-green-700 px-2 py-1 text-lg"
+        type="text"
+        autofocus
+        [(ngModel)]="searchText"
+        (ngModelChange)="onSearch()"
+    />
+    <label class="flex items-center gap-2 cursor-pointer pt-2">
+        <input type="checkbox" [(ngModel)]="isExactMode" (ngModelChange)="onSearch()" class="hidden" />
+        <div class="relative w-10 h-5 bg-gray-300 rounded-full transition duration-300" [class.bg-blue-500]="isExactMode">
+            <div
+                class="absolute left-1 top-1 w-3 h-3 bg-white rounded-full shadow-md transform transition-transform duration-300"
+                [class.translate-x-5]="isExactMode"
+            ></div>
+        </div>
+        <span class="text-sm text-gray-700">Exacte overeenkomst</span>
+    </label>
 </div>
